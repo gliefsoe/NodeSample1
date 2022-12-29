@@ -7,6 +7,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/about', (req, res) => {
+    console.log(`Root of server: ${__dirname}`);
     res.send('about')
   })
 
