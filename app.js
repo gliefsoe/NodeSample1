@@ -1,21 +1,62 @@
 const packageJson = require('./package.json');
 const express = require('express');
-const app = express();
+const WebSocket = require('ws');
+
 const port = 8080;
 const version = packageJson.version;
+
+const app = express();
+const wss = new WebSocket.Server({ port: 3000 });
+
+// store the connection Count
+let connectionCount = 0;
+// store the WebSocket objects for each client
+const clients = {};
+
+wss.on('connection', (ws, req) => {
+    // increment the connection count
+    connectionCount++;
+    // assign a unique identifier to the client
+    const clientId = req.headers['sec-websocket-key'];
+
+    // store the client's WebSocket object
+    clients[clientId] = ws;
+    // log the connection count
+    console.log(`New WebSocket connection: ${clientId}`);
+    console.log(`Number of connections: ${connectionCount}`)
+    console.log(`Client connected remoteaddress: ${req.connection.remoteAddress}`);
+
+  ws.on('message', (message) => {
+    
+    console.log(`Received message from ${clientId}: ${message}`);
+    console.log(`Received message: ${message}`);
+    ws.send(`Echo: ${message}`);
+  });
+
+  ws.on('close', () => {
+    console.log('Client disconnected');
+    connectionCount--;
+
+    console.log(`WebSocket connection closed: ${clientId}`);
+    // remove the client from the clients object
+    delete clients[clientId];
+
+    console.log(`Number of connections: ${connectionCount}`);
+  });
+});
 
 app.get('/', (req, res) => {
     res.send('hello world from node sample 1: ' + req.url);
 });
 
 app.get('/about', (req, res) => {
-    console.log('version:' + version);
+    
     res.send('about')
   })
 
-
+console.log('version:' + version);
 console.log(`Root of server: ${__dirname}`);
 
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`);
+    console.log(`NodeSample listening at http://localhost:${port}`);
 })
