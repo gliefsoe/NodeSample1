@@ -25,24 +25,6 @@ wss.on('connection', (ws, req) => {
     console.log(`New WebSocket connection: ${clientId}`);
     console.log(`Number of connections: ${connectionCount}`)
     console.log(`Client connected remoteaddress: ${req.connection.remoteAddress}`);
-
-  ws.on('message', (message) => {
-    
-    console.log(`Received message from ${clientId}: ${message}`);
-    console.log(`Received message: ${message}`);
-    ws.send(`Echo: ${message}`);
-  });
-
-  ws.on('close', () => {
-    console.log('Client disconnected');
-    connectionCount--;
-
-    console.log(`WebSocket connection closed: ${clientId}`);
-    // remove the client from the clients object
-    delete clients[clientId];
-
-    console.log(`Number of connections: ${connectionCount}`);
-  });
 });
 
 app.get('/', (req, res) => {
